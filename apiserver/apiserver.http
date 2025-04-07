@@ -1,0 +1,19 @@
+PUT http://localhost:8080/api/auth/cookie
+Authorization: Bearer 123
+
+xxx
+
+###
+
+GET http://localhost:8080/api/pv/power
+Authorization: Bearer 123
+
+###
+
+GET http://localhost:8080/api/pv/earnings
+Authorization: Bearer 123
+
+###
+
+GET http://localhost:8080/api/pv/balance
+Authorization: Bearer 123
