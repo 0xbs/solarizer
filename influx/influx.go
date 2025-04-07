@@ -73,6 +73,7 @@ func (i *Importer) RunSlowImport() {
 	}
 	log.Debug("Running slow import")
 	go i.writeEarningsData()
+	go i.writeBalanceData()
 }
 
 func (i *Importer) writePowerData() {
