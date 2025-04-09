@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type PersistentAuthJar struct {
@@ -43,7 +44,8 @@ func NewPersistentAuthJar(filename string, cookieName string, cookieURL *url.URL
 			return nil, err
 		}
 	}
-	p.ResetAuthCookie(string(bytes))
+	cookieValue := strings.TrimSpace(string(bytes))
+	p.ResetAuthCookie(cookieValue)
 	return p, nil
 }
 
