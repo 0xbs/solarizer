@@ -2,28 +2,77 @@
 
 API Server and Influx Importer for SolarWeb.
 
+
 ## Build
 
-Setup Golang and Ko for easy Go containers:
+Setup Golang, download dependencies and run a build:
 ```shell
-brew install go ko
-```
-
-Download dependencies and build:
-```shell
+brew install go
 go mod download
 go build
 ```
 
+To build the container image, install and run ko:
+```shell
+brew install ko
+ko build --local
+```
+
+
 ## Run
 
-Set up environment variables:
+### Docker Compose
 ```yaml
-API_TOKENS: "f6ac06b86a5949abaa2efe333b0d2cef,347ff1b5e5f04097b8a947ebc72608a2"
-SOLAR_WEB_PV_SYSTEM_ID: "331ec2e4-2065-4188-97f8-96dd43d61870"
-SOLAR_WEB_AUTH_COOKIE: "optional-cookie-value"
-INFLUX_URL: "https://influx.example.com"
-INFLUX_TOKEN: "my-influx-token"
-INFLUX_ORG: "my-influx-org"
-INFLUX_BUCKET: "my-influx-bucket"
+solarizer:
+    image: ghcr.io/0xbs/solarizer:latest
+    container_name: solarizer
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Berlin"
+      API_TOKENS: "TODO"
+      SOLAR_WEB_PV_SYSTEM_ID: "TODO"
+      INFLUX_URL: "TODO"
+      INFLUX_TOKEN: "TODO"
+      INFLUX_ORG: "TODO"
+      INFLUX_BUCKET: "TODO"
+    volumes:
+      - "./solarizer:/tmp/solarizer"
+    ports:
+      - 8080:8080
+```
+
+### Environment variables
+
+| Name                       | Description                                                                |
+|----------------------------|----------------------------------------------------------------------------|
+| API_TOKENS                 | Comma-separated list of arbitrary tokens to authenticate                   |
+| INFLUX_URL                 | URL of the influx database                                                 |
+| INFLUX_TOKEN               | API token of the influx database                                           |
+| INFLUX_ORG                 | Organization name                                                          |
+| INFLUX_BUCKET              | Bucket name                                                                |
+| SOLAR_WEB_PV_SYSTEM_ID     | SolarWeb PV System ID found in the URL                                     |
+| SOLAR_WEB_AUTH_COOKIE      | (optional) Value of the auth cookie for initial run                        |
+| SOLAR_WEB_AUTH_COOKIE_FILE | (optional) Path and filename to the a file where the auth cookie is stored |
+
+
+## API
+
+### Endpoints
+
+| Endpoint               | Description                                         |
+|------------------------|-----------------------------------------------------|
+| `PUT /api/auth/cookie` | Set new auth cookie value given in the request body |
+| `GET /api/pv/power`    | Get power data                                      |
+| `GET /api/pv/earnings` | Get earnings and savings data                       |
+| `GET /api/pv/balance`  | Get grid balance data                               |
+
+### Example
+
+```shell
+curl --request PUT \
+  --location 'https://HOSTNAME/api/auth/cookie' \
+  --header 'Authorization: Bearer APITOKEN' \
+  --data 'COOKIEVALUE'
+
+curl --location 'https://HOSTNAME/api/pv/power' --header 'Authorization: Bearer APITOKEN'
 ```
