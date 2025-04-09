@@ -32,7 +32,11 @@ func main() {
 
 	// Initialize SolarWeb client
 	pvSystemId := MustGetenv("SOLAR_WEB_PV_SYSTEM_ID")
-	solarWebClient = solarweb.New(pvSystemId)
+	authCookieFilename := os.Getenv("SOLAR_WEB_AUTH_COOKIE_FILE")
+	if authCookieFilename == "" {
+		authCookieFilename = "/tmp/solarizer/authcookie"
+	}
+	solarWebClient = solarweb.New(pvSystemId, authCookieFilename)
 	if authCookie, ok := os.LookupEnv("SOLAR_WEB_AUTH_COOKIE"); ok {
 		solarWebClient.SetAuthCookie(authCookie)
 	}
@@ -74,6 +78,5 @@ func main() {
 		log.Error("Shutdown of API server failed", "err", err)
 	}
 
-	log.Info("Latest auth cookie", "value", solarWebClient.GetAuthCookie())
 	log.Info("Shutdown complete")
 }

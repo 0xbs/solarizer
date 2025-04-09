@@ -58,19 +58,11 @@ func (i *Importer) RunImportLoop(ctx context.Context) {
 }
 
 func (i *Importer) RunFastImport() {
-	if !i.solarWebClient.IsReady() {
-		log.Warn("SolarWeb client not ready, skipping import")
-		return
-	}
 	log.Debug("Running fast import")
 	go i.writePowerData()
 }
 
 func (i *Importer) RunSlowImport() {
-	if !i.solarWebClient.IsReady() {
-		log.Warn("SolarWeb client not ready, skipping import")
-		return
-	}
 	log.Debug("Running slow import")
 	go i.writeEarningsData()
 	go i.writeBalanceData()
