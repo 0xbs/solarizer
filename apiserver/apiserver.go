@@ -90,7 +90,7 @@ func (s *ApiServer) putAuthCookie(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", status)
 		return
 	}
-	log.Info("Received putAuthCookie request")
+	log.Debug("Received putAuthCookie request")
 	authCookieBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -109,7 +109,7 @@ func (s *ApiServer) getPowerData(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", status)
 		return
 	}
-	log.Info("Received getPowerData request")
+	log.Debug("Received getPowerData request")
 	data, err := s.solarWebClient.GetCompareData()
 	if err != nil {
 		log.Error("Error requesting power data", "err", err)
@@ -134,7 +134,7 @@ func (s *ApiServer) getEarningsAndSavings(w http.ResponseWriter, r *http.Request
 		http.Error(w, "", status)
 		return
 	}
-	log.Info("Received getEarningsAndSavings request")
+	log.Debug("Received getEarningsAndSavings request")
 	data, err := s.solarWebClient.GetEarningsAndSavings()
 	if err != nil {
 		log.Error("Error requesting earnings data", "err", err)
@@ -159,7 +159,7 @@ func (s *ApiServer) getBalance(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", status)
 		return
 	}
-	log.Info("Received getBalance request")
+	log.Debug("Received getBalance request")
 	data, err := s.solarWebClient.GetWidgetChart()
 	if err != nil {
 		log.Error("Error requesting balance data", "err", err)
