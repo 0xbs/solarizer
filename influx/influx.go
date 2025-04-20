@@ -102,7 +102,7 @@ func (i *Importer) writeEarningsData() {
 		AddField("total", parseLocalizedFloat(data.Data.Earnings.Total)).
 		AddField("year", parseLocalizedFloat(data.Data.Earnings.Year)).
 		AddField("month", parseLocalizedFloat(data.Data.Earnings.Month)).
-		AddField("day", parseLocalizedFloat(data.Data.Earnings.Month)).
+		AddField("day", parseLocalizedFloat(data.Data.Earnings.Today)).
 		SetTime(time.Now())
 	logPoint(earnings)
 	i.influxWriteAPI.WritePoint(earnings)
