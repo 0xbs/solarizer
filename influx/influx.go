@@ -3,15 +3,16 @@ package influx
 import (
 	"bytes"
 	"context"
+	"solarizer/solarweb"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/charmbracelet/log"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	influxdb2api "github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	lp "github.com/influxdata/line-protocol"
-	"solarizer/solarweb"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const (
@@ -107,15 +108,20 @@ func (i *Importer) writeEarningsData() {
 	logPoint(earnings)
 	i.influxWriteAPI.WritePoint(earnings)
 
-	savings := influxdb2.NewPointWithMeasurement("co2savings").
-		AddTag("distance_unit", data.Data.TotalCo2Savings.DistanceUnit).
-		AddTag("emission_unit", data.Data.TotalCo2Savings.EmissionUnit).
-		AddField("distance", parseLocalizedFloat(data.Data.TotalCo2Savings.DistanceValue)).
-		AddField("emission", parseLocalizedFloat(data.Data.TotalCo2Savings.EmissionValue)).
-		AddField("trees", parseLocalizedFloat(data.Data.TotalCo2Savings.Trees)).
+	productions := influxdb2.NewPointWithMeasurement("productions").
+		AddTag("total_unit", data.Data.Productions.TotalUnit).
+		AddTag("year_unit", data.Data.Productions.YearUnit).
+		AddTag("month_unit", data.Data.Productions.MonthUnit).
+		AddTag("today_unit", data.Data.Productions.TodayUnit).
+		AddTag("year_label", data.Data.Productions.YearLabel).
+		AddTag("month_label", data.Data.Productions.MonthLabel).
+		AddField("total", parseLocalizedFloat(data.Data.Productions.Total)).
+		AddField("year", parseLocalizedFloat(data.Data.Productions.Year)).
+		AddField("month", parseLocalizedFloat(data.Data.Productions.Month)).
+		AddField("today", parseLocalizedFloat(data.Data.Productions.Today)).
 		SetTime(time.Now())
-	logPoint(savings)
-	i.influxWriteAPI.WritePoint(savings)
+	logPoint(productions)
+	i.influxWriteAPI.WritePoint(productions)
 }
 
 func (i *Importer) writeBalanceData() {

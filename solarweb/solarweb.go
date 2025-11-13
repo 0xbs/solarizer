@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+// Better Login:
+//https://github.com/mattsmith24/pictureframe/blob/f22730227e56c0067d86288c9afe90ca20d1352a/solarweb.py#L124
+
 // Endpoints:
 // /ActualData/GetCompareDataForPvSystem?pvSystemId={pvSystemId}
 // /Chart/GetWidgetChart?PvSystemId={pvSystemId}

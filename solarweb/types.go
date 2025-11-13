@@ -9,10 +9,10 @@ type CompareData struct {
 	PowerLoad         float64 `json:"P_Load"` // Watts from House to Inverter
 	PowerPV           float64 `json:"P_PV"`   // Watts from Cells to Inverter
 	PowerBattery      float64 `json:"P_Batt"` // Watts from Battery to Inverter
-	BatteryPercentage float64 `json:"SOC"`
+	BatteryPercentage float64 `json:"SOC"`    // SOC = State Of Charge
 	BatteryMode       float64 `json:"BatMode"`
 	//OhmPilots         []any   `json:"Ohmpilots"`
-	//WattPilots        []any   `json:"Wattpilots"`
+	//WattPilots        []any   `json:"Wattpilots"` // probably has a field Power float64 `json:"P"`
 	//Consumers         []any   `json:"Consumers"`
 	//Generators        []any   `json:"Generators"`
 }
@@ -30,13 +30,21 @@ type EarningAndSavings struct {
 			YearLabel   string `json:"YearLabel"`
 			TodayLabel  string `json:"TodayLabel"`
 		} `json:"Earnings"`
-		TotalCo2Savings struct {
-			DistanceUnit  string `json:"DistanceUnit"`
-			EmissionValue string `json:"EmissionValue"`
-			EmissionUnit  string `json:"EmissionUnit"`
-			Trees         string `json:"Trees"`
-			DistanceValue string `json:"DistanceValue"`
-		} `json:"TotalCo2Savings"`
+		Productions struct {
+			TotalUnit  string `json:"TotalUnit"`
+			MonthUnit  string `json:"MonthUnit"`
+			YearUnit   string `json:"YearUnit"`
+			TodayUnit  string `json:"TodayUnit"`
+			Total      string `json:"Total"`
+			Month      string `json:"Month"`
+			Year       string `json:"Year"`
+			Today      string `json:"Today"`
+			TotalLabel string `json:"TotalLabel"`
+			MonthLabel string `json:"MonthLabel"`
+			YearLabel  string `json:"YearLabel"`
+			TodayLabel string `json:"TodayLabel"`
+		} `json:"Productions"`
+		// field "TotalCo2Savings" is no longer sent as of Nov 2025
 	} `json:"data"`
 }
 
