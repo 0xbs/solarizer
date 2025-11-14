@@ -90,9 +90,9 @@ func (i *Importer) writePowerData() {
 }
 
 func (i *Importer) writeEarningsData() {
-	data, err := i.solarWebClient.GetEarningsAndSavings()
+	data, err := i.solarWebClient.GetProductionsAndEarnings()
 	if err != nil {
-		log.Error("Error fetching power data", "err", err)
+		log.Error("Error fetching production data", "err", err)
 		return
 	}
 
@@ -127,7 +127,7 @@ func (i *Importer) writeEarningsData() {
 func (i *Importer) writeBalanceData() {
 	data, err := i.solarWebClient.GetWidgetChart()
 	if err != nil {
-		log.Error("Error fetching power data", "err", err)
+		log.Error("Error fetching balance data", "err", err)
 		return
 	}
 

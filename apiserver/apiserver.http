@@ -10,7 +10,7 @@ Authorization: Bearer 123
 
 ###
 
-GET http://localhost:8080/api/pv/earnings
+GET http://localhost:8080/api/pv/production
 Authorization: Bearer 123
 
 ###

@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/charmbracelet/log"
 	"io"
 	"net/http"
 	"os"
 	"solarizer/solarweb"
 	"strings"
+
+	"github.com/charmbracelet/log"
 )
 
 type ApiServer struct {
@@ -36,7 +37,7 @@ func New(addr string, solarWebClient *solarweb.SolarWeb) *ApiServer {
 
 	mux.HandleFunc("/api/auth/cookie", s.putAuthCookie)
 	mux.HandleFunc("/api/pv/power", s.getPowerData)
-	mux.HandleFunc("/api/pv/earnings", s.getEarningsAndSavings)
+	mux.HandleFunc("/api/pv/production", s.getProductionsAndEarnings)
 	mux.HandleFunc("/api/pv/balance", s.getBalance)
 
 	s.initApiTokens()
@@ -125,7 +126,7 @@ func (s *ApiServer) getPowerData(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *ApiServer) getEarningsAndSavings(w http.ResponseWriter, r *http.Request) {
+func (s *ApiServer) getProductionsAndEarnings(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
@@ -134,8 +135,8 @@ func (s *ApiServer) getEarningsAndSavings(w http.ResponseWriter, r *http.Request
 		http.Error(w, "", status)
 		return
 	}
-	log.Debug("Received getEarningsAndSavings request")
-	data, err := s.solarWebClient.GetEarningsAndSavings()
+	log.Debug("Received getProductionsAndEarnings request")
+	data, err := s.solarWebClient.GetProductionsAndEarnings()
 	if err != nil {
 		log.Error("Error requesting earnings data", "err", err)
 		http.Error(w, err.Error(), http.StatusBadGateway)

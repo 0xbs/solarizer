@@ -3,11 +3,12 @@ package solarweb
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sony/gobreaker/v2"
 	"net/http"
 	"net/url"
 	"solarizer/cookies"
 	"time"
+
+	"github.com/sony/gobreaker/v2"
 )
 
 // Better Login:
@@ -110,8 +111,8 @@ func (s *SolarWeb) GetCompareData() (CompareData, error) {
 	return data, err
 }
 
-func (s *SolarWeb) GetEarningsAndSavings() (EarningAndSavings, error) {
-	var data EarningAndSavings
+func (s *SolarWeb) GetProductionsAndEarnings() (ProductionsAndEarnings, error) {
+	var data ProductionsAndEarnings
 
 	resp, err := s.get("/PvSystems/GetPvSystemProductionsAndEarnings?pvSystemId=" + s.pvSystemId)
 	if err != nil {

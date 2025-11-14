@@ -17,7 +17,7 @@ type CompareData struct {
 	//Generators        []any   `json:"Generators"`
 }
 
-type EarningAndSavings struct {
+type ProductionsAndEarnings struct {
 	Data struct {
 		Earnings struct {
 			IsoCurrency string `json:"IsoCurrency"`
