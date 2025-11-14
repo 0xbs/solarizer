@@ -19,7 +19,7 @@ import (
 // /Messages/GetUnreadMessageCountForUser
 // /Messages/GetUnreadMessages
 // /PvSystemImages/GetUrlForId?PvSystemId={pvSystemId}
-// /PvSystems/GetPvSystemEarningsAndSavings?pvSystemId={pvSystemId}
+// /PvSystems/GetPvSystemProductionsAndEarnings?pvSystemId={pvSystemId}
 // /PvSystems/GetWeatherWidgetData?pvSystemId={pvSystemId}
 
 const (
@@ -113,7 +113,7 @@ func (s *SolarWeb) GetCompareData() (CompareData, error) {
 func (s *SolarWeb) GetEarningsAndSavings() (EarningAndSavings, error) {
 	var data EarningAndSavings
 
-	resp, err := s.get("/PvSystems/GetPvSystemEarningsAndSavings?pvSystemId=" + s.pvSystemId)
+	resp, err := s.get("/PvSystems/GetPvSystemProductionsAndEarnings?pvSystemId=" + s.pvSystemId)
 	if err != nil {
 		return data, err
 	}
