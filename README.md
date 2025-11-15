@@ -59,12 +59,12 @@ solarizer:
 
 ### Endpoints
 
-| Endpoint               | Description                                         |
-|------------------------|-----------------------------------------------------|
-| `PUT /api/auth/cookie` | Set new auth cookie value given in the request body |
-| `GET /api/pv/power`    | Get power data                                      |
-| `GET /api/pv/earnings` | Get earnings and savings data                       |
-| `GET /api/pv/balance`  | Get grid balance data                               |
+| Endpoint                 | Description                                         |
+|--------------------------|-----------------------------------------------------|
+| `PUT /api/auth/cookie`.  | Set new auth cookie value given in the request body |
+| `GET /api/pv/power`      | Get power data                                      |
+| `GET /api/pv/production` | Get earnings and productions data                   |
+| `GET /api/pv/balance`    | Get grid balance data                               |
 
 ### Example
 
