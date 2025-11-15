@@ -109,16 +109,12 @@ func (i *Importer) writeEarningsData() {
 	i.influxWriteAPI.WritePoint(earnings)
 
 	productions := influxdb2.NewPointWithMeasurement("productions").
-		AddTag("total_unit", data.Data.Productions.TotalUnit).
-		AddTag("year_unit", data.Data.Productions.YearUnit).
-		AddTag("month_unit", data.Data.Productions.MonthUnit).
-		AddTag("today_unit", data.Data.Productions.TodayUnit).
-		AddTag("year_label", data.Data.Productions.YearLabel).
-		AddTag("month_label", data.Data.Productions.MonthLabel).
-		AddField("total", parseLocalizedFloat(data.Data.Productions.Total)).
-		AddField("year", parseLocalizedFloat(data.Data.Productions.Year)).
-		AddField("month", parseLocalizedFloat(data.Data.Productions.Month)).
-		AddField("today", parseLocalizedFloat(data.Data.Productions.Today)).
+		AddTag("year_name", data.Data.Productions.YearLabel).
+		AddTag("month_name", data.Data.Productions.MonthLabel).
+		AddField("total", parseLocalizedFloat(data.Data.Productions.Total)*getEnergyUnitFactor(data.Data.Productions.TotalUnit)).
+		AddField("year", parseLocalizedFloat(data.Data.Productions.Year)*getEnergyUnitFactor(data.Data.Productions.YearUnit)).
+		AddField("month", parseLocalizedFloat(data.Data.Productions.Month)*getEnergyUnitFactor(data.Data.Productions.MonthUnit)).
+		AddField("today", parseLocalizedFloat(data.Data.Productions.Today)*getEnergyUnitFactor(data.Data.Productions.TodayUnit)).
 		SetTime(time.Now())
 	logPoint(productions)
 	i.influxWriteAPI.WritePoint(productions)
@@ -138,6 +134,23 @@ func (i *Importer) writeBalanceData() {
 		SetTime(time.Now())
 	logPoint(balance)
 	i.influxWriteAPI.WritePoint(balance)
+}
+
+func getEnergyUnitFactor(unit string) float64 {
+	switch unit {
+	case "Wh":
+		return 1.0
+	case "kWh":
+		return 1e3
+	case "MWh":
+		return 1e6
+	case "GWh":
+		return 1e9
+	case "TWh":
+		return 1e12
+	default:
+		return 1.0
+	}
 }
 
 // parseLocalizedFloatWithUnit converts strings like "12,4 kWh" into float64 12.4
