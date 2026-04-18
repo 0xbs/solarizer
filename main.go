@@ -43,14 +43,20 @@ func main() {
 	log.Info("SolarWeb client initialized", "pvSystemId", pvSystemId)
 
 	// Create importer
-	dbConfig := influx.DBConfig{
-		Url:    MustGetenv("INFLUX_URL"),
-		Token:  MustGetenv("INFLUX_TOKEN"),
-		Org:    MustGetenv("INFLUX_ORG"),
-		Bucket: MustGetenv("INFLUX_BUCKET"),
+	enableInfluxImporter := os.Getenv("ENABLE_INFLUX_IMPORTER") == "true"
+	var importer *influx.Importer
+	if enableInfluxImporter {
+		dbConfig := influx.DBConfig{
+			Url:    MustGetenv("INFLUX_URL"),
+			Token:  MustGetenv("INFLUX_TOKEN"),
+			Org:    MustGetenv("INFLUX_ORG"),
+			Bucket: MustGetenv("INFLUX_BUCKET"),
+		}
+		importer = influx.NewImporter(dbConfig, solarWebClient)
+		log.Info("Influx importer initialized")
+	} else {
+		log.Info("Influx importer disabled")
 	}
-	importer := influx.NewImporter(dbConfig, solarWebClient)
-	log.Info("Influx importer initialized")
 
 	// Create api
 	api := apiserver.New(apiServerAddr, solarWebClient)
@@ -65,7 +71,9 @@ func main() {
 
 	// Run tasks asynchronously
 	go api.ListenAndServe()
-	go importer.RunImportLoop(ctx)
+	if importer != nil {
+		go importer.RunImportLoop(ctx)
+	}
 
 	// Block and wait for signal
 	sig := <-quit

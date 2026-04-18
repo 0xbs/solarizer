@@ -31,6 +31,7 @@ solarizer:
       TZ: "Europe/Berlin"
       API_TOKENS: "TODO"
       SOLAR_WEB_PV_SYSTEM_ID: "TODO"
+      ENABLE_INFLUX_IMPORTER: "true"
       INFLUX_URL: "TODO"
       INFLUX_TOKEN: "TODO"
       INFLUX_ORG: "TODO"
@@ -43,16 +44,17 @@ solarizer:
 
 ### Environment variables
 
-| Name                       | Description                                                                |
-|----------------------------|----------------------------------------------------------------------------|
-| API_TOKENS                 | Comma-separated list of arbitrary tokens to authenticate                   |
-| INFLUX_URL                 | URL of the influx database                                                 |
-| INFLUX_TOKEN               | API token of the influx database                                           |
-| INFLUX_ORG                 | Organization name                                                          |
-| INFLUX_BUCKET              | Bucket name                                                                |
-| SOLAR_WEB_PV_SYSTEM_ID     | SolarWeb PV System ID found in the URL                                     |
-| SOLAR_WEB_AUTH_COOKIE      | (optional) Value of the auth cookie for initial run                        |
-| SOLAR_WEB_AUTH_COOKIE_FILE | (optional) Path and filename to the a file where the auth cookie is stored |
+| Name                       | Description                                                                  |
+|----------------------------|------------------------------------------------------------------------------|
+| API_TOKENS                 | Comma-separated list of arbitrary tokens to authenticate                     |
+| ENABLE_INFLUX_IMPORTER     | Set to "true" to enable the Influx importer                                  |
+| INFLUX_URL                 | URL of the influx database                                                   |
+| INFLUX_TOKEN               | API token of the influx database                                             |
+| INFLUX_ORG                 | Organization name                                                            |
+| INFLUX_BUCKET              | Bucket name                                                                  |
+| SOLAR_WEB_PV_SYSTEM_ID     | SolarWeb PV System ID found in the URL                                       |
+| SOLAR_WEB_AUTH_COOKIE      | (optional) Value of the auth cookie for initial run                          |
+| SOLAR_WEB_AUTH_COOKIE_FILE | (optional) Path and filename to the a file where the auth cookie is stored   |
 
 
 ## API
