@@ -4,3 +4,6 @@
 .DS_Store
 *.exe
 dist/
+
+solarizer
+solarizer.exe
