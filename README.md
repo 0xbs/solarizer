@@ -31,6 +31,8 @@ solarizer:
       TZ: "Europe/Berlin"
       API_TOKENS: "TODO"
       SOLAR_WEB_PV_SYSTEM_ID: "TODO"
+      SOLAR_WEB_USERNAME: "TODO"
+      SOLAR_WEB_PASSWORD: "TODO"
       ENABLE_INFLUX_IMPORTER: "true"
       INFLUX_URL: "TODO"
       INFLUX_TOKEN: "TODO"
@@ -55,6 +57,10 @@ solarizer:
 | SOLAR_WEB_PV_SYSTEM_ID     | SolarWeb PV System ID found in the URL                                       |
 | SOLAR_WEB_AUTH_COOKIE      | (optional) Value of the auth cookie for initial run                          |
 | SOLAR_WEB_AUTH_COOKIE_FILE | (optional) Path and filename to the a file where the auth cookie is stored   |
+| SOLAR_WEB_USERNAME         | SolarWeb/Fronius username for automatic re-login                             |
+| SOLAR_WEB_PASSWORD         | SolarWeb/Fronius password for automatic re-login                             |
+
+If `SOLAR_WEB_USERNAME` and `SOLAR_WEB_PASSWORD` are set, `solarizer` will try to perform an automatic login when SolarWeb redirects requests back to the login flow because the auth cookie expired. The refreshed `.AspNet.Auth` cookie is then persisted in `SOLAR_WEB_AUTH_COOKIE_FILE` as before.
 
 
 ## API

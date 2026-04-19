@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/charmbracelet/log"
 	"os"
 	"os/signal"
 	"solarizer/apiserver"
@@ -10,6 +9,8 @@ import (
 	"solarizer/solarweb"
 	"syscall"
 	"time"
+
+	"github.com/charmbracelet/log"
 )
 
 const (
@@ -36,7 +37,9 @@ func main() {
 	if authCookieFilename == "" {
 		authCookieFilename = "/tmp/solarizer/authcookie"
 	}
-	solarWebClient = solarweb.New(pvSystemId, authCookieFilename)
+	solarWebUsername := MustGetenv("SOLAR_WEB_USERNAME")
+	solarWebPassword := MustGetenv("SOLAR_WEB_PASSWORD")
+	solarWebClient = solarweb.New(pvSystemId, authCookieFilename, solarWebUsername, solarWebPassword)
 	if authCookie, ok := os.LookupEnv("SOLAR_WEB_AUTH_COOKIE"); ok {
 		solarWebClient.SetAuthCookie(authCookie)
 	}
