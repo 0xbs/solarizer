@@ -33,7 +33,6 @@ solarizer:
       SOLAR_WEB_PV_SYSTEM_ID: "TODO"
       SOLAR_WEB_USERNAME: "TODO"
       SOLAR_WEB_PASSWORD: "TODO"
-      ENABLE_INFLUX_IMPORTER: "true"
       INFLUX_URL: "TODO"
       INFLUX_TOKEN: "TODO"
       INFLUX_ORG: "TODO"
@@ -49,7 +48,8 @@ solarizer:
 | Name                       | Description                                                                  |
 |----------------------------|------------------------------------------------------------------------------|
 | API_TOKENS                 | Comma-separated list of arbitrary tokens to authenticate                     |
-| ENABLE_INFLUX_IMPORTER     | Set to "true" to enable the Influx importer                                  |
+| DISABLE_API_SERVER         | (optional) Set to "true" to disable the API server                           |
+| DISABLE_INFLUX_IMPORTER    | (optional) Set to "true" to disable the Influx importer                      |
 | INFLUX_URL                 | URL of the influx database                                                   |
 | INFLUX_TOKEN               | API token of the influx database                                             |
 | INFLUX_ORG                 | Organization name                                                            |
@@ -61,6 +61,8 @@ solarizer:
 | SOLAR_WEB_PASSWORD         | SolarWeb/Fronius password for automatic re-login                             |
 
 If `SOLAR_WEB_USERNAME` and `SOLAR_WEB_PASSWORD` are set, `solarizer` will try to perform an automatic login when SolarWeb redirects requests back to the login flow because the auth cookie expired. The refreshed `.AspNet.Auth` cookie is then persisted in `SOLAR_WEB_AUTH_COOKIE_FILE` as before.
+
+By default, both the API server and the Influx importer are enabled. Set `DISABLE_API_SERVER=true` or `DISABLE_INFLUX_IMPORTER=true` to turn them off.
 
 
 ## API

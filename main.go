@@ -46,9 +46,10 @@ func main() {
 	log.Info("SolarWeb client initialized", "pvSystemId", pvSystemId)
 
 	// Create importer
-	enableInfluxImporter := os.Getenv("ENABLE_INFLUX_IMPORTER") == "true"
 	var importer *influx.Importer
-	if enableInfluxImporter {
+	if os.Getenv("DISABLE_INFLUX_IMPORTER") == "true" {
+		log.Info("Influx importer disabled")
+	} else {
 		dbConfig := influx.DBConfig{
 			Url:    MustGetenv("INFLUX_URL"),
 			Token:  MustGetenv("INFLUX_TOKEN"),
@@ -57,13 +58,16 @@ func main() {
 		}
 		importer = influx.NewImporter(dbConfig, solarWebClient)
 		log.Info("Influx importer initialized")
-	} else {
-		log.Info("Influx importer disabled")
 	}
 
 	// Create api
-	api := apiserver.New(apiServerAddr, solarWebClient)
-	log.Info("API server initialized", "addr", apiServerAddr)
+	var api *apiserver.ApiServer
+	if os.Getenv("DISABLE_API_SERVER") == "true" {
+		log.Info("API server disabled")
+	} else {
+		api = apiserver.New(apiServerAddr, solarWebClient)
+		log.Info("API server initialized", "addr", apiServerAddr)
+	}
 
 	// Create a channel to capture SIGTERM, SIGINT
 	quit := make(chan os.Signal, 1)
@@ -73,7 +77,9 @@ func main() {
 	defer stop()
 
 	// Run tasks asynchronously
-	go api.ListenAndServe()
+	if api != nil {
+		go api.ListenAndServe()
+	}
 	if importer != nil {
 		go importer.RunImportLoop(ctx)
 	}
@@ -85,8 +91,10 @@ func main() {
 	// Shutdown api server
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := api.Shutdown(shutdownCtx); err != nil {
-		log.Error("Shutdown of API server failed", "err", err)
+	if api != nil {
+		if err := api.Shutdown(shutdownCtx); err != nil {
+			log.Error("Shutdown of API server failed", "err", err)
+		}
 	}
 
 	log.Info("Shutdown complete")
