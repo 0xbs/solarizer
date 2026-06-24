@@ -1,13 +1,14 @@
 package cookies
 
 import (
-	"github.com/charmbracelet/log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/charmbracelet/log"
 )
 
 type PersistentAuthJar struct {
@@ -45,7 +46,9 @@ func NewPersistentAuthJar(filename string, cookieName string, cookieURL *url.URL
 		}
 	}
 	cookieValue := strings.TrimSpace(string(bytes))
-	p.ResetAuthCookie(cookieValue)
+	if cookieValue != "" {
+		p.ResetAuthCookie(cookieValue)
+	}
 	return p, nil
 }
 

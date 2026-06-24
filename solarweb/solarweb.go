@@ -2,6 +2,7 @@ package solarweb
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,6 +39,7 @@ const (
 )
 
 var cookieURL = &url.URL{Scheme: "https", Host: domain, Path: "/"}
+var errAuthenticationRequired = errors.New("authentication required")
 
 type SolarWeb struct {
 	pvSystemId string
@@ -61,6 +63,9 @@ func New(pvSystemId string, authCookieFilename string, username string, password
 		ReadyToTrip: func(counts gobreaker.Counts) bool {
 			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
 			return counts.Requests >= 3 && failureRatio >= 0.6
+		},
+		IsExcluded: func(err error) bool {
+			return errors.Is(err, errAuthenticationRequired)
 		},
 	}
 	cb := gobreaker.NewCircuitBreaker[*http.Response](cbSettings)
@@ -89,7 +94,11 @@ func (s *SolarWeb) get(path string) (*http.Response, error) {
 		return resp, nil
 	}
 
-	log.Warn("SolarWeb request failed, attempting re-authentication", "path", path, "err", err)
+	if !errors.Is(err, errAuthenticationRequired) {
+		return nil, err
+	}
+
+	log.Warn("SolarWeb authentication required, attempting re-authentication", "path", path)
 	if loginErr := s.login(); loginErr != nil {
 		return nil, fmt.Errorf("%w: automatic re-login failed: %w", err, loginErr)
 	}
@@ -112,7 +121,7 @@ func (s *SolarWeb) doGet(path string) (*http.Response, error) {
 		}
 		if s.isAuthenticationRequired(resp) {
 			_ = resp.Body.Close()
-			return nil, fmt.Errorf("authentication required")
+			return nil, errAuthenticationRequired
 		}
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 			_ = resp.Body.Close()
@@ -180,18 +189,16 @@ func (s *SolarWeb) login() error {
 	}
 	defer externalLoginResp.Body.Close()
 
-	sessionDataKey := externalLoginResp.Request.URL.Query().Get("sessionDataKey")
-	if sessionDataKey == "" {
-		return fmt.Errorf("missing sessionDataKey in %q", externalLoginResp.Request.URL.String())
+	if externalLoginResp.StatusCode < 200 || externalLoginResp.StatusCode >= 300 {
+		return fmt.Errorf("external login returned %s", externalLoginResp.Status)
 	}
 
-	form := url.Values{
-		"sessionDataKey": {sessionDataKey},
-		"username":       {s.username},
-		"password":       {s.password},
-		"chkRemember":    {"on"},
+	loginActionURL, loginValues, err := parseLoginForm(externalLoginResp, s.username, s.password)
+	if err != nil {
+		return err
 	}
-	commonauthResp, err := s.newRequest(http.MethodPost, loginURL, strings.NewReader(form.Encode()))
+
+	commonauthResp, err := s.newRequest(http.MethodPost, loginActionURL, strings.NewReader(loginValues.Encode()))
 	if err != nil {
 		return err
 	}
@@ -241,6 +248,35 @@ func (s *SolarWeb) newRequest(method string, rawURL string, body io.Reader) (*ht
 	return resp, nil
 }
 
+func parseLoginForm(resp *http.Response, username string, password string) (string, url.Values, error) {
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		return "", nil, fmt.Errorf("unable to parse SolarWeb login form: %w", err)
+	}
+
+	form := findLoginForm(doc)
+	if form == nil {
+		return "", nil, fmt.Errorf("unable to find SolarWeb login form in %q", responseURL(resp))
+	}
+
+	values := url.Values{}
+	collectInputValues(form, values)
+
+	if values.Get("sessionDataKey") == "" && resp != nil && resp.Request != nil && resp.Request.URL != nil {
+		values.Set("sessionDataKey", resp.Request.URL.Query().Get("sessionDataKey"))
+	}
+	if values.Get("sessionDataKey") == "" {
+		return "", nil, fmt.Errorf("missing sessionDataKey in %q", responseURL(resp))
+	}
+
+	values.Set("username", username)
+	values.Set("usernameUserInput", username)
+	values.Set("password", password)
+	values.Set("chkRemember", "on")
+
+	return formActionURL(resp, form), values, nil
+}
+
 func parseLoginCallbackForm(resp *http.Response) (url.Values, error) {
 	requiredFields := []string{"code", "id_token", "state", "AuthenticatedIdPs", "session_state"}
 	doc, err := html.Parse(resp.Body)
@@ -258,6 +294,84 @@ func parseLoginCallbackForm(resp *http.Response) (url.Values, error) {
 	}
 
 	return values, nil
+}
+
+func findLoginForm(node *html.Node) *html.Node {
+	if node.Type == html.ElementNode && node.Data == "form" {
+		id, _ := attrValue(node, "id")
+		action, _ := attrValue(node, "action")
+		if id == "loginForm" || strings.Contains(action, "commonauth") {
+			return node
+		}
+	}
+
+	for child := node.FirstChild; child != nil; child = child.NextSibling {
+		if form := findLoginForm(child); form != nil {
+			return form
+		}
+	}
+
+	return nil
+}
+
+func collectInputValues(node *html.Node, values url.Values) {
+	if node.Type == html.ElementNode && node.Data == "input" {
+		name, ok := attrValue(node, "name")
+		if ok && name != "" {
+			inputType, _ := attrValue(node, "type")
+			switch strings.ToLower(inputType) {
+			case "button", "file", "image", "submit":
+			case "checkbox", "radio":
+				if _, checked := attrValue(node, "checked"); checked {
+					value, _ := attrValue(node, "value")
+					if value == "" {
+						value = "on"
+					}
+					values.Set(name, value)
+				}
+			default:
+				value, _ := attrValue(node, "value")
+				values.Set(name, value)
+			}
+		}
+	}
+
+	for child := node.FirstChild; child != nil; child = child.NextSibling {
+		collectInputValues(child, values)
+	}
+}
+
+func formActionURL(resp *http.Response, form *html.Node) string {
+	action, ok := attrValue(form, "action")
+	if !ok || action == "" {
+		return loginURL
+	}
+
+	actionURL, err := url.Parse(action)
+	if err != nil {
+		return loginURL
+	}
+	if resp == nil || resp.Request == nil || resp.Request.URL == nil {
+		return actionURL.String()
+	}
+
+	return resp.Request.URL.ResolveReference(actionURL).String()
+}
+
+func responseURL(resp *http.Response) string {
+	if resp == nil || resp.Request == nil || resp.Request.URL == nil {
+		return ""
+	}
+	return resp.Request.URL.String()
+}
+
+func attrValue(node *html.Node, targetKey string) (string, bool) {
+	for _, attr := range node.Attr {
+		if attr.Key == targetKey {
+			return attr.Val, true
+		}
+	}
+	return "", false
 }
 
 func findHiddenInputValue(node *html.Node, targetName string) (string, bool) {
