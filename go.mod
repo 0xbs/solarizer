@@ -7,7 +7,7 @@ require (
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf
 	github.com/sony/gobreaker/v2 v2.4.0
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.56.0
 )
 
 require (
@@ -23,12 +23,12 @@ require (
 	github.com/go-logfmt/logfmt v0.6.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
-	github.com/mattn/go-isatty v0.0.21 // indirect
-	github.com/mattn/go-runewidth v0.0.23 // indirect
+	github.com/mattn/go-isatty v0.0.22 // indirect
+	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
-	github.com/oapi-codegen/runtime v1.4.0 // indirect
+	github.com/oapi-codegen/runtime v1.4.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
-	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/exp v0.0.0-20260611194520-c48552f49976 // indirect
+	golang.org/x/sys v0.46.0 // indirect
 )
